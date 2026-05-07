@@ -1,0 +1,48 @@
+Given the variables extracted from memory:
+    POSITION Varriables:
+        cpu_x and cpu_y for cpu position
+        play_x and play_y for player position
+        distance measures pixel distance between enemy and player
+        X position details:
+            x position is measured rightwards(right is positive) bounded(54-459)
+        Y position details:
+            y position is measured upwards(upwards is position) bounded(20 to ~90)
+        Distance details:
+            Tested in the integrated environment:
+                Throws register in range between 0 and 20
+                Largest normal attack registers in <43
+                Largest physical special move in <120
+                187 max distance
+        from these i can get certain information about the world:
+            Is a character airborne?(y >= 50) (Player and Enemy)
+            Is player on right?(play_x>play_y) (only player)
+            4 attack ranges are reasonable, close_range(<20),medium_range(<43),large_range(<120),fullscreen(120<x<187)
+            Is a character in the corner?(LEFT(x<100), RIGHT(x>410)) (player and enemy)
+            Is the player in the round start position?(x=205)
+    HEALTH and MATCH Varriables:
+        Player and Enemy Health:
+            Health point values for player and cpu
+        Active_Enemy:
+            Boolean, tells if enemy has an active attack    
+        Match win counter, resets when ryu wins 2 games
+        continuetimer, starts counting down when ryu loses
+        self_active while ryu does a special or normal move will be 10 or 12
+            Should not press anything during this(nothing happens),
+            Calculate reward the frame that it returns to 0, 
+            this tells the reward of an action after its active frames are over
+        Ideas:
+            Store a boolean for if active play or not:
+                If not active play do not store info, and do not act, hold block left input
+                When health reaches 0 for either, set to false
+                When player x goes to 205, and then decreases at all, return to active state
+        
+    Idea for Utility calculatons:
+        Positive Utility if action results in opponent health decrease:
+            Number of hitpoints opponent loses
+        Positive Utility if opponent has active attack, and player health does not decrease
+            +20
+        Negative Utility if player takes damage from attack:
+            Amount of health lost by player
+        
+            
+    

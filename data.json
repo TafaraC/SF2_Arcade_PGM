@@ -1,0 +1,56 @@
+{
+  "info": {
+    "active_p2": {
+      "address": 16745279,
+      "type": "|u1"
+    },
+    "continuetimer": {
+      "address": 16744917,
+      "type": "|u1"
+    },
+    "cpu_x": {
+      "address": 16745302,
+      "type": ">i4"
+    },
+    "cpu_y": {
+      "address": 16745099,
+      "type": "|d1"
+    },
+    "distance": {
+      "address": 16744650,
+      "type": ">u4"
+    },
+    "enemy_health": {
+      "address": 16745154,
+      "type": ">i2"
+    },
+    "enemy_matches_won": {
+      "address": 16745559,
+      "type": ">u4"
+    },
+    "health": {
+      "address": 16744514,
+      "type": ">i2"
+    },
+    "matches_won": {
+      "address": 16744922,
+      "type": "|u1"
+    },
+    "play_x": {
+      "address": 16744662,
+      "type": ">i4"
+    },
+    "play_y": {
+      "address": 16744458,
+      "type": ">d2"
+    },
+    "score": {
+      "address": 16744936,
+      "type": ">d4"
+    },
+    "self_active": {
+      "address": 16744451,
+      "type": "|u1"
+    }
+  }
+}
