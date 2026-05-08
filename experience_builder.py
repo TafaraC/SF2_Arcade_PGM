@@ -26,17 +26,14 @@ class SF2_Experience_Builder:
         self.active = False 
         
         # Action definitions [MK, LK, MODE, START, U, D, L, R, HK, MP, LP, HP]
-        self.ACTIONS={
+        self.ACTIONS = {
             "Block": [False,[[0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0]]],
             "Crouch_Block": [False,[[0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0]]], 
-            "Crouch_Block_Right": [False,[0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0]],
             "Walk_Forward": [False,[[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]]], 
             "Walk_Left": [False,[0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]],
             "Vertical_Jump": [False,[0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0]],
             "Jump_Forward": [False,[[0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0],[0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0]]], 
             "Jump_Back": [False,[[0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0],[0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]]], 
-            "Jump_Right": [False,[0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]],
-            "Jump_Left": [False,[0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0]],
             "Light_Punch": [False,[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]],
             "Medium_Punch": [False,[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0]],
             "Heavy_Punch": [False,[0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]],
@@ -51,7 +48,19 @@ class SF2_Experience_Builder:
                                 [[0,0,0,0,0,0,1,0,0,0,0,0], [0,0,0,0,0,1,0,0,0,0,0,0], [0,0,0,0,0,1,1,0,0,0,0,1]]]], 
             "Tatsumaki": [True,[[[0,0,0,0,0,1,0,0,0,0,0,0], [0,0,0,0,0,1,1,0,0,0,0,0], [1,0,0,0,0,0,1,0,0,0,0,0]],
                                 [[0,0,0,0,0,1,0,0,0,0,0,0], [0,0,0,0,0,1,0,1,0,0,0,0], [1,0,0,0,0,0,0,1,0,0,0,0]]]], 
-            "Neutral": [False,[0,0,0,0,0,0,0,0,0,0,0,0]]    
+            "Neutral": [False,[0,0,0,0,0,0,0,0,0,0,0,0]],
+            "Down_LP": [False,[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0]],
+            "Down_MP": [False,[0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0]],
+            "Down_HP": [False,[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1]],
+            "Down_LK": [False,[0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]],
+            "Down_MK": [False,[1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]],
+            "Down_HK": [False,[0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0]]    
+        }
+        
+        self.ATTACK_ACTIONS = {
+            "Light_Punch", "Medium_Punch", "Heavy_Punch", "Light_Kick", "Medium_Kick", 
+            "Heavy_Kick", "Throw_Forward", "Throw_Back", "Fireball", "Shoryuken", 
+            "Tatsumaki", "Down_LP", "Down_MP", "Down_HP", "Down_LK", "Down_MK", "Down_HK"
         }
 
     def get_semantic_state(self, info):
