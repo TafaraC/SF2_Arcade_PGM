@@ -3,6 +3,7 @@ import pandas as pd
 import random
 from collections import deque
 import time
+import os  # Added to check if file exists for header management
 
 class SF2_Experience_Builder:
     def __init__(self):
@@ -10,7 +11,7 @@ class SF2_Experience_Builder:
         self.env = stable_retro.make(
             game='StreetFighterIISpecialChampionEdition-Genesis-v0', 
             use_restricted_actions=stable_retro.Actions.FILTERED,
-            #render_mode=None,
+            render_mode=None,
             obs_type=stable_retro.Observations.RAM
         )
         self.action_queue = deque() 
@@ -93,7 +94,6 @@ class SF2_Experience_Builder:
         elif e_x > self.last_e_x: movement = "RECEDING"
         else: movement = "STATIONARY"
         
-        # Expanded semantic state with more information
         return {
             "opponent": self.opponents[self.current_opponent_index],
             "prev_action_rewarded": self.last_action_rewarded,
@@ -135,18 +135,14 @@ class SF2_Experience_Builder:
                 self.action_queue.append(inputs)
 
     def run_data_collection(self, runs_per_opponent=5, max_steps_per_run=1000000000):
-        """Loops through the entire roster, fighting each opponent n times sequentially."""
         start_time = time.time()
         
         for opp_idx, opponent_name in enumerate(self.opponents):
             self.current_opponent_index = opp_idx
             
             for match in range(runs_per_opponent):
-                print(f"\n======================================")
                 print(f"FIGHTING: {opponent_name} | MATCH {match + 1} OF {runs_per_opponent}")
-                print(f"======================================")
                 
-                # Load specific opponent state
                 self.env.load_state(opponent_name)
                 obs = self.env.reset()
                 _, _, _, _, info = self.env.step(self.ACTIONS["Neutral"][1])
@@ -154,7 +150,6 @@ class SF2_Experience_Builder:
                 self.is_active_play = False
                 self.action_queue.clear()
                 done = False
-                
                 self.last_action_name = "Neutral"
                 self.last_action_rewarded = False
                 
@@ -167,11 +162,9 @@ class SF2_Experience_Builder:
                     enemy_matches_won = info.get('enemy_matches_won', 0)
                     continue_timer = info.get('continuetimer', 0)
                     
-                    # Match condition logic: break if either side wins 2 rounds
                     if matches_won == 2 or enemy_matches_won == 2 or continue_timer > 0 or done:
                         break 
 
-                    # --- ACTIVE PLAY LOGIC ---
                     if health <= 0 or enemy_health <= 0:
                         self.is_active_play = False
                         self.action_queue.clear()
@@ -180,26 +173,19 @@ class SF2_Experience_Builder:
                         self.last_hp = health
                         self.last_enemy_hp = enemy_health
 
-                    # --- ACTION SELECTION & MEMORY ---
                     if not self.is_active_play:
                         current_input = [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
                     else:
                         semantic_state = self.get_semantic_state(info)
                         
                         if not semantic_state["active"] and len(self.action_queue) == 0:
-                            
-                            # 1. UPDATE MEMORY FIRST
                             if self.current_state is not None:
                                 utility = self.calculate_utility(info)
                                 self.history.append((self.current_state, self.current_action_name, utility))
-                                
                                 self.last_action_rewarded = bool(utility > 0)
                                 self.last_action_name = self.current_action_name
                             
-                            # 2. SET NEW STATE
                             self.current_state = semantic_state
-                            
-                            # 3. SELECT AND QUEUE ACTION
                             self.current_action_name = random.choice(list(self.ACTIONS.keys()))
                             self.queue_action(self.current_action_name, semantic_state["player_on_right"])
 
@@ -208,38 +194,25 @@ class SF2_Experience_Builder:
                         else:
                             current_input = self.ACTIONS["Neutral"][1]
 
-                    # --- STEP ENVIRONMENT ---
                     _, _, terminated, truncated, info = self.env.step(current_input)
                     done = terminated or truncated
-                    
                     self.last_e_x = info.get('cpu_x', 307)
                     self.last_p_x = info.get('play_x', 205)
+
+            # SAVE AFTER EACH CHARACTER IS COMPLETE
+            print(f"Character {opponent_name} complete. Saving progress...")
+            self.save_data()
                
         end_time = time.time()
-        total_seconds = end_time - start_time
-        minutes = int(total_seconds // 60)
-        seconds = int(total_seconds % 60)
-    
-        print("\n" + "="*30)
-        print(f"TRAINING COMPLETE!")
-        total_runs = len(self.opponents) * runs_per_opponent
-        print(f"Total time for {total_runs} matches: {minutes}m {seconds}s")
-        print(f"Average time per match: {total_seconds / total_runs:.2f} seconds")
-        print("="*30)
-
+        print(f"\nTRAINING COMPLETE! Total time: {(end_time - start_time)/60:.2f} minutes")
         self.env.close()
-        self.save_data()
 
     def save_data(self):
-        """Flattens the dictionary state and saves everything cleanly to a CSV."""
+        """Appends current history to CSV and clears memory."""
         if not self.history:
-            print("No history collected. Skipping save.")
             return
 
-        # Extract state keys dynamically
         state_keys = list(self.history[0][0].keys())
-        
-        # Flatten the history rows
         flat_history = []
         for state_dict, action, utility in self.history:
             row = [state_dict[k] for k in state_keys] + [action, utility]
@@ -249,10 +222,18 @@ class SF2_Experience_Builder:
         df = pd.DataFrame(flat_history, columns=columns)
         
         filename = "sf2_experience_data_full_runs.csv"
-        df.to_csv(filename, index=False)
-        print(f"\nAll runs completed. Collected {len(self.history)} total interactions.")
-        print(f"Data cleanly flattened and saved to {filename}.")
+        
+        # Check if file exists to decide on writing the header
+        file_exists = os.path.isfile(filename)
+        
+        # Mode 'a' for append, header=False if file already exists
+        df.to_csv(filename, mode='a', index=False, header=not file_exists)
+        
+        print(f"Appended {len(self.history)} interactions to {filename}.")
+        
+        # CLEAR HISTORY to free up RAM for the next opponent
+        self.history = []
 
 if __name__ == "__main__":
     agent = SF2_Experience_Builder()
-    agent.run_data_collection(runs_per_opponent=1) # Adjust as needed
+    agent.run_data_collection(runs_per_opponent=1000)

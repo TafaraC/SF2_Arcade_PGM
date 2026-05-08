@@ -229,4 +229,4 @@ class Trained_SF2_Agent:
 
 if __name__ == "__main__":
     trained_agent = Trained_SF2_Agent()
-    trained_agent.watch_agent_play(matches_per_opponent=1)
+    trained_agent.watch_agent_play(matches_per_opponent=3)

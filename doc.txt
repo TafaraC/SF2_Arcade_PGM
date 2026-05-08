@@ -135,3 +135,10 @@ Actions:
 		Down HP
 		
 
+Challenges:
+memory
+feature selection:
+	The state space can explode depending on how the nodes are chosen
+	for example, my prior action node, i wanted it to not just be whether it
+	was an attack or not. i wanted it to be the exact action my agent took prior and whether it had a reward associated
+	but then i wouldve scaled my state space by a factor of my action space again and that wouldve made data collection much longer
