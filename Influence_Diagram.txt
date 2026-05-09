@@ -1,0 +1,32 @@
+Tafara Chibanda <2683459@students.wits.ac.za>
+	
+12:08 (3 hours ago)
+	
+	
+to me
+Why is this message in spam?
+
+This message is similar to messages that were identified as spam in the past.
+Based on the code you provided for your SF2_Experience_Builder, your Influence Diagram (ID) has a very specific, flat structure. It is composed of three distinct types of nodes, mapping exactly to how your agent perceives the game, makes a choice, and gets rewarded.
+Here is the exact current structure of your model:
+### 1. The Chance Nodes (State Variables)
+These are the yellow circular/oval nodes in a standard ID. They represent the current environment that Ryu finds himself in, which is outside of his immediate control. Based on your get_semantic_state function, you currently have 9 Chance Nodes:
+ Range: (CLOSE, MEDIUM, LARGE, FULLSCREEN)
+ Player Airborne: (True / False)
+ Opponent Airborne: (True / False)
+ Player on Right: (True / False)
+ Player in Corner: (True / False)
+ Enemy in Corner: (True / False)
+ Enemy Attacking: (True / False)
+ Enemy Movement: (APPROACHING, RECEDING, STATIONARY)
+ Active State: (True / False) — Whether Ryu is currently locked in an animation.
+### 2. The Decision Node (Action Space)
+This is the blue square node in an ID. It represents the choice your agent has to make.
+ Ryu's Action: A single node containing 22 mutually exclusive choices (e.g., Fireball, Shoryuken, Crouch_Block, Heavy_Punch, etc.).
+### 3. The Utility Node (Reward Function)
+This is the green diamond node. It represents the final value or "payout" of the interaction. Based on your calculate_utility function, this node is measuring:
+ Health Difference: The sum of u_offense (damage dealt to enemy), u_penalty (damage taken by Ryu), and u_defense (a +20 bonus for successfully blocking an active attack without taking damage).
+### 4. The Edges (How it all connects)
+The way these nodes wire together is what makes it a complete Influence Diagram:
+ Information Arcs (Dashed Lines): You have a directed edge going from every single Chance Node into your Decision Node. This means your agent plays with "perfect information" of the abstracted state—Ryu looks at the distance, whether the enemy is jumping, corner positioning, etc., before he decides which button to press.
+ Value Arcs (Solid Lines): You have directed edges going from every single Chance Node AND the Decision Node into the Utility Node. This represents the core logic of your tabular method: The final Health Difference payout is entirely dependent on the specific situation (the state) combined with what Ryu chose to do (the action).

@@ -1,0 +1,144 @@
+Input schema:
+	Actions are multibinaries of the form:
+		[B, A, MODE, START, UP, DOWN, LEFT, RIGHT, C, Y, X, Z]
+		[MK,LK,MODE,START,U,D,L,R,HK,MP,LP,HP]
+		Where each button corresponds to:
+		A: Light kick
+		B: Medium kick
+		C:Hard kick
+		X: Light punch
+		Y:Medium punch
+		Z: Hard punch
+		MODE:
+		START:Pause/menu nav
+		UP:Up directional input
+		DOWN:down directional input
+		LEFT:Left directional input
+		RIGHT: Rigth directional input
+		
+		
+	There will also be macro actions related to punch and kick:
+		DOWN,DOWN+FORWARD,FORWARD+PUNCH: Hadouken (FIREBALL)
+		FORWARD,DOWN,DOWN+FORWARD+PUNCH: Shoryuken (RISING UPPERCUT)
+		DOWN,DOWN+BACK,BACK+KICK: Tatsumaki Senpukyaku(HURRICANE KICK)
+	
+	Furthermore, the properties of moves
+
+Details/conditions:
+Throw distance/close = distance<20
+Largest attack distance(2mk) <=43
+Left corner pos(54 or 55) 
+right corner (457-459)
+Baseline y_pos = 20
+
+	
+Observables:
+	cpu_x: enemy x position
+	cpu_y: enemy y position
+	distance: distance measured between player and enemy
+	enemy_health: enemy health
+	health: player health
+	play_x: Player x position measured left to right(54-459)
+	play_y: Player y position, 20 is grounded
+	
+Actions:
+	As defined above:
+	[MK,LK,MODE,START,U,D,L,R,HK,MP,LP,HP]
+	[0,0,0,0,0,0,0,0,0,0,0,0]
+	Block Left:
+	[0,0,0,0,0,0,1,0,0,0,0,0]
+	Block Right:
+	[0,0,0,0,0,0,0,1,0,0,0,0]
+	Crouch Block Left:
+	[0,0,0,0,0,1,1,0,0,0,0,0]
+	Coruch Block Right
+	[0,0,0,0,0,1,0,1,0,0,0,0]
+	Walk Right:
+	[0,0,0,0,0,0,0,1,0,0,0,0]
+	Walk Left:
+	[0,0,0,0,0,0,1,0,0,0,0,0]
+	Vertical Jump:
+	[0,0,0,0,1,0,0,0,0,0,0,0]
+	Jump Left:
+	[0,0,0,0,1,0,1,0,0,0,0,0]
+	Jump Right:
+	[0,0,0,0,1,0,0,1,0,0,0,0]
+	Light Medium and Heavy Punch:
+		Individual button presses
+		[0,0,0,0,0,0,0,0,0,0,1,0]
+		[0,0,0,0,0,0,0,0,0,1,0,0]
+		[0,0,0,0,0,0,0,0,0,0,0,1]
+	Light Medium and Heavy Kick:
+		Individual button presses
+		[0,1,0,0,0,0,0,0,0,0,0,0]
+		[1,0,0,0,0,0,0,0,0,0,0,0]
+		[0,0,0,0,0,0,0,0,1,0,0,0]
+	Fireball:
+		Macro input
+		RIGHT
+		[0,0,0,0,0,1,0,0,0,0,0,0],
+		[0,0,0,0,0,1,1,0,0,0,0,0],
+		[0,0,0,0,0,0,1,0,0,0,0,1]
+		LEFT
+		[0,0,0,0,0,1,0,0,0,0,0,0],
+		[0,0,0,0,0,1,0,1,0,0,0,0],
+		[0,0,0,0,0,0,0,1,0,0,0,1]
+	Shoryuken:
+		Macro input
+		RIGHT
+		[0,0,0,0,0,0,1,0,0,0,0,0]
+		[0,0,0,0,0,1,0,0,0,0,0,0],
+		[0,0,0,0,0,1,1,0,0,0,0,1],
+		LEFT
+		[0,0,0,0,0,0,0,1,0,0,0,0],
+		[0,0,0,0,0,1,0,0,0,0,0,0],
+		[0,0,0,0,0,1,0,1,0,0,0,1]
+		
+		
+	Tatsumaki Senpukyaku:
+		(Only Medium kick)
+		Macro input
+		RIGHT
+		[0,0,0,0,0,1,0,0,0,0,0,0],
+		[0,0,0,0,0,1,0,1,0,0,0,0],
+		[1,0,0,0,0,0,0,1,0,0,0,0]
+		LEFT
+		[0,0,0,0,0,1,0,0,0,0,0,0],
+		[0,0,0,0,0,1,1,0,0,0,0,0],
+		[1,0,0,0,0,0,1,0,0,0,0,0]
+    Throw Left
+    []
+    Throw Right
+	[]	
+	Inputs will be handled via a queue, on each frame player will select action from queue,
+	or if queue is empty use influence diagram model to decide which action to take or add
+	to queue
+	
+	Actions_Generally:
+	SIDE DEPENDENT:
+		Block
+		Crouch Block
+		Walk Forward
+		Jump Forward 
+		Jump Backward
+		Fireball
+		Shoryuken
+		Tatsumaki
+	SIDE INDEPENDENT:
+		Vertical Jump
+		LP
+		MP
+		HP
+		LK
+		MK
+		HK
+		Down HP
+		
+
+Challenges:
+memory
+feature selection:
+	The state space can explode depending on how the nodes are chosen
+	for example, my prior action node, i wanted it to not just be whether it
+	was an attack or not. i wanted it to be the exact action my agent took prior and whether it had a reward associated
+	but then i wouldve scaled my state space by a factor of my action space again and that wouldve made data collection much longer
