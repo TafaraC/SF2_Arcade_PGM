@@ -7,7 +7,7 @@ import time
 import os
 
 class SF2_Boss_Refiner:
-    def __init__(self, brain_file="ryu_brain.pkl"):
+    def __init__(self, brain_file="uni_ryu_brain.pkl"):
         self.env = stable_retro.make(
             game='StreetFighterIISpecialChampionEdition-Genesis-v0', 
             use_restricted_actions=stable_retro.Actions.FILTERED,
@@ -32,7 +32,7 @@ class SF2_Boss_Refiner:
         self.selection_counter = 0  # To track the 2 vs 2 rhythm
         
         # TARGET THE Losing enemies 
-        self.opponents = ["ryu","e_honda","blanka", "sagat", "m_bison"]
+        self.opponents = ["ryu","e_honda", "sagat", "m_bison"]
         self.current_opponent_index = 0
         
         # Load the Brain for the "Smart" moves
@@ -216,4 +216,4 @@ class SF2_Boss_Refiner:
 
 if __name__ == "__main__":
     builder = SF2_Boss_Refiner()
-    builder.run_data_collection(runs_per_opponent=500) # Targeted refinement
+    builder.run_data_collection(runs_per_opponent=1000) # Targeted refinement

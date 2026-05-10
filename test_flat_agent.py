@@ -4,8 +4,7 @@ from collections import deque
 import time
 
 class Trained_SF2_Agent:
-    def __init__(self, brain_file="ryu_brain.pkl"):
-        # render_mode="human" so we can watch Ryu fight
+    def __init__(self, brain_file="flat_ryu_brain.pkl"):
         self.env = stable_retro.make(
             game='StreetFighterIISpecialChampionEdition-Genesis-v0', 
             use_restricted_actions=stable_retro.Actions.FILTERED,
@@ -25,8 +24,8 @@ class Trained_SF2_Agent:
         self.current_opponent_name = "guile"
         self.last_matches_won = 0
         self.last_enemy_matches_won = 0
-        self.opponents = ["ryu", 
-            "e_honda", "sagat", "m_bison"
+        self.opponents = [
+            "ryu", "e_honda","sagat", "m_bison"
         ]
         
         # Load the trained policy (The "Brain")

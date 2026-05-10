@@ -25,8 +25,9 @@ class Trained_SF2_Agent:
         self.current_opponent_name = "guile"
         self.last_matches_won = 0
         self.last_enemy_matches_won = 0
-        self.opponents = ["ryu", 
-            "e_honda", "sagat", "m_bison"
+        self.opponents = [
+            "guile", "ken", "chun_li", "zangief", "dhalsim", "ryu", 
+            "e_honda", "blanka", "balrog", "vega", "sagat", "m_bison"
         ]
         
         # Load the trained policy (The "Brain")
@@ -237,7 +238,9 @@ class Trained_SF2_Agent:
                     self.last_p_x = info.get('play_x', 205)
                     
                     # Render limit (~60fps)
-                    time.sleep(1/480.0)
+                    time.sleep(1/360.0)
+        for i in range(480):
+            self.env.step(self.ACTIONS["Neutral"][1])
 
         self.env.close()
 

@@ -46,7 +46,7 @@ def train_influence_diagram(csv_path):
     return policy_dict, state_columns
 
 # Run the training
-policy, state_keys = train_influence_diagram("sf2_experience_data_full_runs.csv")
+policy, state_keys = train_influence_diagram("sf2_experience_data_original.csv")
 with open("ryu_brain.pkl", "wb") as f:
     pickle.dump({"policy": policy, "state_keys": state_keys}, f)
 print("Brain saved to ryu_brain.pkl!")
